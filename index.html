@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FAFAF7">
+  <title>Ranked — Battle dich mit Freunden</title>
+  <meta name="description" content="Echte Achievements. Echte Freunde. Echtes Ranking.">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  <link rel="icon" type="image/svg+xml" href="icon-192.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ranked">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-view="loading">
+
+  <!-- ─────────────── APP LOADING SCREEN -->
+  <section class="view view--loading" data-view="loading">
+    <div class="loading">
+      <div class="loading__logo">
+        <span class="loading__mark">R</span>
+      </div>
+      <div class="loading__brand">Ranked</div>
+      <div class="loading__bar"><span></span></div>
+    </div>
+  </section>
+
+  <!-- ─────────────── SPLASH -->
+  <section class="view view--splash" data-view="splash">
+    <div class="splash">
+      <div class="splash__logo">
+        <span class="splash__mark">R</span>
+      </div>
+      <h1 class="splash__title">Ranked</h1>
+      <p class="splash__lede">Battle dich mit Freunden in dem was zählt.<br>Achievements. Punkte. Stadt-Ranking.</p>
+
+      <div class="splash__features">
+        <div class="splash__feature">
+          <span class="splash__feature-num">01</span>
+          <span class="splash__feature-text">Trag echte Wins ein — Freunde bestätigen</span>
+        </div>
+        <div class="splash__feature">
+          <span class="splash__feature-num">02</span>
+          <span class="splash__feature-text">Battle in Freunde-Liste + Stadt-Top-100</span>
+        </div>
+        <div class="splash__feature">
+          <span class="splash__feature-num">03</span>
+          <span class="splash__feature-text">Hol dir den ersten Platz</span>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--block" data-action="goto-onboarding">Profil anlegen</button>
+    </div>
+  </section>
+
+  <!-- ─────────────── ONBOARDING -->
+  <section class="view view--onboarding" data-view="onboarding" hidden>
+    <header class="topbar">
+      <button class="iconbtn" data-action="back-to-splash" aria-label="Zurück">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="topbar__step"><span data-onb-step>1</span> / 3</span>
+      <span></span>
+    </header>
+
+    <form class="onb" id="onboarding-form">
+      <fieldset class="onb__pane" data-step="1">
+        <p class="eyebrow">Schritt 1 / 3</p>
+        <h2 class="onb__title">Wie heißt du?</h2>
+        <p class="onb__hint">Echter Name. Kein Anonym-Game.</p>
+        <input class="input" type="text" name="name" placeholder="z. B. Benet Adamanm" autocomplete="given-name" required>
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
+      </fieldset>
+
+      <fieldset class="onb__pane" data-step="2" hidden>
+        <p class="eyebrow">Schritt 2 / 3</p>
+        <h2 class="onb__title">Deine Stadt?</h2>
+        <p class="onb__hint">Hier siehst du die Top-100 deiner Stadt.</p>
+        <input class="input" type="text" name="city" placeholder="z. B. Wiesbaden" autocomplete="address-level2" required>
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
+      </fieldset>
+
+      <fieldset class="onb__pane" data-step="3" hidden>
+        <p class="eyebrow">Schritt 3 / 3</p>
+        <h2 class="onb__title">Baseline</h2>
+        <p class="onb__hint">Damit dein Wachstum messbar wird. Kannst du jederzeit ändern.</p>
+        <div class="onb__row">
+          <label class="field">
+            <span class="field__label">Größe (cm)</span>
+            <input class="input" type="number" name="height" min="120" max="230" value="180">
+          </label>
+          <label class="field">
+            <span class="field__label">Gewicht (kg)</span>
+            <input class="input" type="number" name="weight" min="35" max="200" value="78">
+          </label>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Avatar-Farbe</span>
+          <ul class="color-picker" data-bind="onbColors"></ul>
+          <input type="hidden" name="avatarColor" value="auto">
+        </div>
+
+        <button class="btn btn--primary btn--block" type="submit">Profil erstellen</button>
+      </fieldset>
+    </form>
+  </section>
+
+  <!-- ─────────────── HOME / PROFIL -->
+  <section class="view view--home" data-view="home" hidden>
+    <header class="topbar">
+      <h1 class="topbar__brand">Ranked</h1>
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--bell" data-action="open-notifications" aria-label="Benachrichtigungen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="iconbtn__badge" data-bind="notif.count" hidden>0</span>
+        </button>
+        <button class="iconbtn" data-action="open-search" aria-label="Freunde suchen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button class="iconbtn" data-action="open-settings" aria-label="Einstellungen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="profile-card">
+      <div class="profile-card__row">
+        <div class="avatar avatar--lg" data-bind="user.avatar"></div>
+        <div class="profile-card__meta">
+          <h2 class="profile-card__name" data-bind="user.name">—</h2>
+          <p class="profile-card__city">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span data-bind="user.city">—</span>
+          </p>
+        </div>
+      </div>
+
+      <p class="profile-card__bio" data-bind="user.bio" hidden></p>
+      <div class="profile-card__goal" data-bind="user.goal" hidden>
+        <span class="profile-card__goal-label">Ziel:</span>
+        <span data-bind="user.goalText"></span>
+      </div>
+
+      <div class="profile-card__score">
+        <div class="profile-card__points" data-bind="user.score">0</div>
+        <div class="profile-card__points-label">Punkte gesamt</div>
+        <div class="profile-card__bonus" data-bind="user.bonus" hidden></div>
+      </div>
+
+      <div class="profile-card__ranks">
+        <a class="rank-chip" data-route="leaderboard" data-tab="friends">
+          <span class="rank-chip__label">Freunde</span>
+          <span class="rank-chip__rank">#<span data-bind="rank.friends">—</span> <span class="rank-chip__total">/ <span data-bind="total.friends">—</span></span></span>
+        </a>
+        <a class="rank-chip" data-route="leaderboard" data-tab="city">
+          <span class="rank-chip__label">Stadt</span>
+          <span class="rank-chip__rank">#<span data-bind="rank.city">—</span> <span class="rank-chip__total">/ 100</span></span>
+        </a>
+      </div>
+    </div>
+
+    <div class="streak-card" data-bind-section="streak" hidden>
+      <div class="streak-card__icon">🔥</div>
+      <div class="streak-card__main">
+        <div class="streak-card__num"><span data-bind="streak.days">0</span></div>
+        <div class="streak-card__label">Tage Streak — bleib dran</div>
+      </div>
+      <div class="streak-card__chip" data-bind="streak.chip">—</div>
+    </div>
+
+    <section class="section" data-bind-section="goals">
+      <header class="section__head">
+        <h3 class="section__title">Deine Ziele</h3>
+        <button class="btn btn--ghost btn--sm" data-action="add-goal">+ Ziel</button>
+      </header>
+      <ul class="goal-list" data-bind="goalList"></ul>
+    </section>
+
+    <section class="section" data-bind-section="goal" hidden>
+      <div class="goal-banner">
+        <div class="goal-banner__icon">🎯</div>
+        <div class="goal-banner__main">
+          <div class="goal-banner__title" data-bind="goal.title">—</div>
+          <div class="goal-banner__sub" data-bind="goal.sub">—</div>
+          <div class="goal-banner__bar"><span data-bind="goal.bar"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-bind-section="suggestions" hidden>
+      <header class="section__head">
+        <h3 class="section__title">Nächste Wins</h3>
+        <span class="section__hint">Für dich vorgeschlagen</span>
+      </header>
+      <ul class="suggestions" data-bind="suggestions"></ul>
+    </section>
+
+    <section class="section" data-bind-section="squads">
+      <header class="section__head">
+        <h3 class="section__title">Squads</h3>
+        <button class="btn btn--ghost btn--sm" data-action="open-create-squad">+ Squad</button>
+      </header>
+      <ul class="squad-list" data-bind="squadsHome"></ul>
+    </section>
+
+    <section class="section" data-bind-section="challenges">
+      <header class="section__head">
+        <h3 class="section__title">Challenges</h3>
+        <button class="btn btn--ghost btn--sm" data-action="open-create-challenge">+ Challenge starten</button>
+      </header>
+      <ul class="challenge-list" data-bind="challenges"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Kategorien</h3>
+        <span class="section__hint">Punkte je Bereich</span>
+      </header>
+      <ul class="cat-list" data-bind="categories"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Trophy-Wall</h3>
+        <button class="btn btn--ghost btn--sm" data-action="add-trophy">+ Hinzufügen</button>
+      </header>
+      <ul class="trophy-wall" data-bind="trophies"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Deine Achievements</h3>
+        <span class="section__hint" data-bind="user.achCount">0</span>
+      </header>
+      <ol class="ach-feed" data-bind="ownFeed"></ol>
+    </section>
+
+    <button class="fab" data-action="open-add-achievement" aria-label="Achievement hinzufügen">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Achievement</span>
+    </button>
+  </section>
+
+  <!-- ─────────────── FEED -->
+  <section class="view view--feed" data-view="feed" hidden>
+    <header class="topbar">
+      <h1 class="topbar__title">Feed</h1>
+      <button class="iconbtn" data-action="open-search" aria-label="Freunde suchen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </button>
+    </header>
+
+    <ol class="stories" data-bind="stories"></ol>
+
+    <p class="section__lede">Was deine Freunde gerade geclaimt haben.</p>
+
+    <ol class="activity" data-bind="activity"></ol>
+  </section>
+
+  <!-- ─────────────── LEADERBOARD -->
+  <section class="view view--leaderboard" data-view="leaderboard" hidden>
+    <header class="topbar">
+      <h1 class="topbar__title">Ranking</h1>
+      <button class="iconbtn" data-action="open-filter" aria-label="Filter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="6" y2="6"/><line x1="6" x2="18" y1="12" y2="12"/><line x1="9" x2="15" y1="18" y2="18"/></svg>
+      </button>
+    </header>
+
+    <nav class="seg" role="tablist">
+      <button class="seg__btn seg__btn--active" data-tab="friends" role="tab">Freunde</button>
+      <button class="seg__btn" data-tab="city" role="tab">Stadt</button>
+    </nav>
+
+    <nav class="filter-row" data-bind="filterChips"></nav>
+
+    <ol class="board" data-bind="board"></ol>
+  </section>
+
+  <!-- ─────────────── STATS -->
+  <section class="view view--stats" data-view="stats" hidden>
+    <header class="topbar">
+      <h1 class="topbar__title">Stats</h1>
+      <button class="iconbtn" data-action="open-history" aria-label="History">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </button>
+    </header>
+
+    <p class="section__lede">Wie deine Punkte zustande kommen.</p>
+
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: var(--s-3);">
+      <button class="btn btn--ghost btn--sm" type="button" data-action="open-recap">📊 Wochenrückblick</button>
+      <button class="btn btn--ghost btn--sm" type="button" data-action="open-map">✈ Reise-Karte</button>
+    </div>
+
+    <div class="stats-hero">
+      <div class="stats-hero__main">
+        <div class="stats-hero__num" data-bind="stats.score">0</div>
+        <div class="stats-hero__label">Punkte gesamt</div>
+      </div>
+      <div class="stats-hero__delta" data-bind="stats.delta">+0 / Woche</div>
+    </div>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Verteilung</h3>
+        <span class="section__hint">Punkte je Kategorie</span>
+      </header>
+      <div class="donut-wrap">
+        <svg class="donut" viewBox="0 0 200 200" data-bind="donut" aria-hidden="true"></svg>
+        <ul class="donut-legend" data-bind="donutLegend"></ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Punkte über Zeit</h3>
+        <span class="section__hint">Letzte 8 Wochen</span>
+      </header>
+      <svg class="sparkline" viewBox="0 0 320 100" data-bind="sparkline" aria-hidden="true"></svg>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Diese Woche</h3>
+      </header>
+      <ul class="week-grid" data-bind="weekGrid"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Aktivitäts-Grid</h3>
+        <span class="section__hint">Letzte 12 Wochen</span>
+      </header>
+      <div class="grid-card">
+        <ul class="contrib-grid" data-bind="contribGrid"></ul>
+        <div class="contrib-legend">
+          <span>weniger</span>
+          <span class="contrib-cell contrib-cell--0"></span>
+          <span class="contrib-cell contrib-cell--1"></span>
+          <span class="contrib-cell contrib-cell--2"></span>
+          <span class="contrib-cell contrib-cell--3"></span>
+          <span class="contrib-cell contrib-cell--4"></span>
+          <span>mehr</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Highlights</h3>
+      </header>
+      <ul class="highlights" data-bind="highlights"></ul>
+    </section>
+  </section>
+
+  <!-- ─────────────── MAP -->
+  <section class="view view--map" data-view="map" hidden>
+    <header class="topbar">
+      <button class="iconbtn" data-action="back" aria-label="Zurück">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="topbar__title">Reise-Karte</h1>
+      <button class="iconbtn" data-action="add-country" aria-label="Land hinzufügen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </header>
+
+    <div class="map-stats">
+      <div class="map-stat">
+        <span class="map-stat__num" data-bind="map.countries">0</span>
+        <span class="map-stat__label">Länder</span>
+      </div>
+      <div class="map-stat">
+        <span class="map-stat__num" data-bind="map.continents">0</span>
+        <span class="map-stat__label">Kontinente</span>
+      </div>
+      <div class="map-stat">
+        <span class="map-stat__num" data-bind="map.points">0</span>
+        <span class="map-stat__label">Travel-Punkte</span>
+      </div>
+    </div>
+
+    <div class="map-canvas">
+      <svg class="map-svg" viewBox="0 0 360 200" data-bind="mapSvg" aria-hidden="true"></svg>
+    </div>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Besuchte Länder</h3>
+        <span class="section__hint" data-bind="map.countriesLabel">0</span>
+      </header>
+      <ul class="country-list" data-bind="countryList"></ul>
+    </section>
+  </section>
+
+  <!-- ─────────────── ADD COUNTRY MODAL -->
+  <dialog class="modal" id="add-country-modal" aria-labelledby="add-country-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="add-country-title">Land hinzufügen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="search__input" type="text" placeholder="Land suchen…" data-bind-id="country-search">
+        </div>
+        <ul class="country-search-results" data-bind="countrySearchResults"></ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── SQUAD DETAIL -->
+  <section class="view view--squad" data-view="squad" hidden>
+    <header class="topbar">
+      <button class="iconbtn" data-action="back" aria-label="Zurück">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="topbar__title">Squad</h1>
+      <span></span>
+    </header>
+    <div class="squad-view" data-bind="squadDetail"></div>
+  </section>
+
+  <!-- ─────────────── CREATE SQUAD MODAL -->
+  <dialog class="modal" id="create-squad-modal" aria-labelledby="create-squad-title">
+    <form class="modal__inner" id="create-squad-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="create-squad-title">Neuen Squad erstellen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Name</span>
+          <input class="input" name="squadName" type="text" placeholder="z. B. Frankfurt Hustlers" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Emoji</span>
+          <input class="input" name="squadEmoji" type="text" placeholder="z. B. 🔥" maxlength="4" required value="⚡">
+        </label>
+        <p class="field__label">Mitglieder wählen</p>
+        <ul class="squad-member-picker" data-bind="squadMemberPicker"></ul>
+      </div>
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Erstellen</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── CUSTOM ACHIEVEMENT MODAL -->
+  <dialog class="modal" id="custom-ach-modal" aria-labelledby="custom-ach-title">
+    <form class="modal__inner" id="custom-ach-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="custom-ach-title">Eigenes Achievement</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <p class="muted">Definiere ein Achievement das nur du und deine Squad-Mitglieder claimen können.</p>
+        <label class="field">
+          <span class="field__label">Titel</span>
+          <input class="input" name="caTitle" type="text" maxlength="50" placeholder="z. B. Erste 50 Squat-Reps am Stück" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Beschreibung</span>
+          <input class="input" name="caSub" type="text" maxlength="80" placeholder="z. B. Ohne Pause, sauberer Form">
+        </label>
+        <label class="field">
+          <span class="field__label">Kategorie</span>
+          <select class="input" name="caCat" required>
+            <option value="finanzen">Finanzen</option>
+            <option value="fitness" selected>Fitness</option>
+            <option value="skills">Skills</option>
+            <option value="streaks">Streaks</option>
+            <option value="social">Social</option>
+            <option value="travel">Reisen</option>
+            <option value="mind">Mindset</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Punkte</span>
+          <input class="input" name="caPoints" type="number" min="50" max="10000" step="50" value="500" required>
+        </label>
+      </div>
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Erstellen</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── COMMENTS MODAL -->
+  <dialog class="modal" id="comments-modal" aria-labelledby="comments-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="comments-title">Kommentare</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__scroll">
+        <ul class="comments" data-bind="commentsList"></ul>
+      </div>
+      <footer class="modal__foot" style="border-top: 1px solid var(--border); display: flex; gap: 8px; padding: 12px 16px;">
+        <input class="input" type="text" placeholder="Kommentar schreiben…" data-bind-id="comment-input" maxlength="200" style="flex:1;">
+        <button class="btn btn--primary" type="button" data-action="post-comment">Senden</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── ADD GOAL MODAL -->
+  <dialog class="modal" id="add-goal-modal" aria-labelledby="add-goal-title">
+    <form class="modal__inner" id="add-goal-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="add-goal-title">Neues Ziel</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Was willst du erreichen?</span>
+          <input class="input" name="goalText" type="text" maxlength="80" placeholder="z. B. Bench 120 kg" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Bis wann?</span>
+          <input class="input" name="goalDate" type="date" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Kategorie</span>
+          <select class="input" name="goalCat">
+            <option value="finanzen">Finanzen</option>
+            <option value="fitness" selected>Fitness</option>
+            <option value="skills">Skills</option>
+            <option value="streaks">Streaks</option>
+            <option value="social">Social</option>
+            <option value="travel">Reisen</option>
+            <option value="mind">Mindset</option>
+            <option value="other">Sonstiges</option>
+          </select>
+        </label>
+      </div>
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Setzen</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── HISTORY -->
+  <section class="view view--history" data-view="history" hidden>
+    <header class="topbar">
+      <button class="iconbtn" data-action="back" aria-label="Zurück">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="topbar__title">Historie</h1>
+      <span></span>
+    </header>
+
+    <nav class="filter-row" data-bind="historyFilters"></nav>
+
+    <ol class="history-timeline" data-bind="historyList"></ol>
+  </section>
+
+  <!-- ─────────────── COMPARE MODAL -->
+  <dialog class="modal" id="compare-modal" aria-labelledby="compare-title">
+    <div class="modal__inner modal__inner--full">
+      <header class="modal__head">
+        <h2 class="modal__title" id="compare-title">Vergleich</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__scroll">
+        <div class="compare" data-bind="compareView"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── ACHIEVEMENT DETAIL MODAL -->
+  <dialog class="modal" id="ach-detail-modal" aria-labelledby="ach-detail-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="ach-detail-title">Achievement</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body" data-bind="achDetail"></div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── WEEKLY RECAP MODAL -->
+  <dialog class="modal" id="recap-modal" aria-labelledby="recap-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="recap-title">Deine Woche</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body" data-bind="recapBody"></div>
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Schließen</button>
+        <button class="btn btn--primary btn--block" type="button" data-action="share-recap">Teilen</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── PROFILE (other user) -->
+  <section class="view view--profile" data-view="profile" hidden>
+    <header class="topbar">
+      <button class="iconbtn" data-action="back" aria-label="Zurück">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="topbar__title">Profil</h1>
+      <button class="iconbtn" data-action="open-compare" aria-label="Vergleichen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/></svg>
+      </button>
+    </header>
+
+    <div class="profile-card">
+      <div class="profile-card__row">
+        <div class="avatar avatar--lg" data-bind="other.avatar"></div>
+        <div class="profile-card__meta">
+          <h2 class="profile-card__name" data-bind="other.name">—</h2>
+          <p class="profile-card__city">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span data-bind="other.city">—</span> · <span class="profile-card__rank">#<span data-bind="other.cityRank">—</span></span>
+          </p>
+        </div>
+      </div>
+
+      <p class="profile-card__bio" data-bind="other.bio" hidden></p>
+      <div class="profile-card__goal" data-bind="other.goal" hidden>
+        <span class="profile-card__goal-label">Ziel:</span>
+        <span data-bind="other.goalText"></span>
+      </div>
+
+      <div class="profile-card__score">
+        <div class="profile-card__points" data-bind="other.score">0</div>
+        <div class="profile-card__points-label">Punkte gesamt</div>
+      </div>
+    </div>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Kategorien</h3>
+      </header>
+      <ul class="cat-list" data-bind="other.categories"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Trophy-Wall</h3>
+      </header>
+      <ul class="trophy-wall" data-bind="other.trophies"></ul>
+    </section>
+
+    <section class="section">
+      <header class="section__head">
+        <h3 class="section__title">Achievements</h3>
+        <span class="section__hint" data-bind="other.achCount">0</span>
+      </header>
+      <ol class="ach-feed" data-bind="other.feed"></ol>
+    </section>
+  </section>
+
+  <!-- ─────────────── ADD-ACHIEVEMENT MODAL -->
+  <dialog class="modal" id="add-achievement-modal" aria-labelledby="add-ach-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="add-ach-title">Achievement hinzufügen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div style="padding: var(--s-3) var(--s-5) 0; display: flex; gap: 8px;">
+        <div class="search" style="flex:1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="search__input" type="text" placeholder="Achievement suchen…" data-bind-id="ach-global-search">
+        </div>
+        <button class="btn btn--ghost btn--sm" type="button" data-action="open-custom-ach" title="Eigenes Achievement">+</button>
+      </div>
+
+      <nav class="seg seg--scroll" data-bind="catTabs"></nav>
+
+      <div class="modal__scroll">
+        <ul class="ach-list" data-bind="achList"></ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── ADD-TROPHY MODAL -->
+  <dialog class="modal" id="add-trophy-modal" aria-labelledby="add-tro-title">
+    <form class="modal__inner" id="add-trophy-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="add-tro-title">Trophy hinzufügen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Kategorie</span>
+          <select class="input" name="trophyCategory" required>
+            <option value="auto">Auto</option>
+            <option value="watch">Uhr</option>
+            <option value="invest">Investment</option>
+            <option value="business">Business</option>
+            <option value="other">Sonstiges</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Bezeichnung</span>
+          <input class="input" name="trophyLabel" type="text" placeholder="z. B. BMW M3 Competition" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Detail (optional)</span>
+          <input class="input" name="trophyDetail" type="text" placeholder="z. B. 2024, Frozen White">
+        </label>
+        <p class="muted">Trophy-Wall ist Showcase. 0 Punkte.</p>
+      </div>
+
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Hinzufügen</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── CONFIRM-FLOW MODAL -->
+  <dialog class="modal" id="confirm-modal" aria-labelledby="confirm-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="confirm-title">Bestätigung holen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <div class="confirm-card">
+          <div class="confirm-card__points">+<span data-bind="confirm.points">0</span></div>
+          <div class="confirm-card__name" data-bind="confirm.name">—</div>
+          <div class="confirm-card__cat" data-bind="confirm.cat">—</div>
+        </div>
+
+        <p class="field__label">Wer bestätigt's?</p>
+        <ul class="confirm-friends" data-bind="confirm.friends"></ul>
+
+        <label class="upload">
+          <input type="file" accept="image/*" name="proof" data-bind-id="confirm-proof">
+          <span class="upload__inner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <span class="upload__label">Foto-Beweis <em>(für Stadt-Leaderboard)</em></span>
+            <span class="upload__filename" data-bind="confirm.proofName"></span>
+          </span>
+        </label>
+      </div>
+
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="button" data-action="confirm-achievement">Bestätigen</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── SEARCH FRIENDS MODAL -->
+  <dialog class="modal" id="search-modal" aria-labelledby="search-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="search-title">Freunde finden</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="search__input" type="text" placeholder="Name oder Stadt suchen…" data-bind-id="search-input">
+        </div>
+
+        <ul class="search-results" data-bind="searchResults"></ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── NOTIFICATIONS MODAL -->
+  <dialog class="modal" id="notifications-modal" aria-labelledby="notif-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="notif-title">Benachrichtigungen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <ul class="notif-list" data-bind="notifList"></ul>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── SETTINGS MODAL -->
+  <dialog class="modal" id="settings-modal" aria-labelledby="settings-title">
+    <form class="modal__inner" id="settings-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="settings-title">Profil bearbeiten</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Name</span>
+          <input class="input" name="settingsName" type="text" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Stadt</span>
+          <input class="input" name="settingsCity" type="text" required>
+        </label>
+        <label class="field">
+          <span class="field__label">Bio (max. 80 Zeichen)</span>
+          <input class="input" name="settingsBio" type="text" maxlength="80" placeholder="z. B. Hustle hard, train harder.">
+        </label>
+        <label class="field">
+          <span class="field__label">Aktuelles Ziel</span>
+          <input class="input" name="settingsGoal" type="text" maxlength="80" placeholder="z. B. Bench 120 kg bis Sommer">
+        </label>
+        <div class="onb__row">
+          <label class="field">
+            <span class="field__label">Größe (cm)</span>
+            <input class="input" name="settingsHeight" type="number" min="120" max="230">
+          </label>
+          <label class="field">
+            <span class="field__label">Gewicht (kg)</span>
+            <input class="input" name="settingsWeight" type="number" min="35" max="200">
+          </label>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Avatar-Farbe</span>
+          <ul class="color-picker" data-bind="settingsColors"></ul>
+          <input type="hidden" name="settingsColor" value="auto">
+        </div>
+
+        <label class="field">
+          <span class="field__label">Theme</span>
+          <div class="seg" style="margin: 0;">
+            <button class="seg__btn" type="button" data-theme-set="light">☀ Hell</button>
+            <button class="seg__btn" type="button" data-theme-set="dark">☾ Dunkel</button>
+            <button class="seg__btn" type="button" data-theme-set="auto">⚙ System</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Sound-Effekte</span>
+          <button class="btn btn--ghost" type="button" data-action="toggle-sound" data-bind="sound.label">🔊 Sound an</button>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Hilfe</span>
+          <button class="btn btn--ghost" type="button" data-action="replay-tutorial">🎬 Tutorial nochmal anzeigen</button>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Daten</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn--ghost btn--sm" type="button" data-action="export-data" style="flex: 1;">⬇ Export (JSON)</button>
+            <label class="btn btn--ghost btn--sm" style="flex: 1; cursor: pointer;">
+              ⬆ Import
+              <input type="file" accept="application/json" data-bind-id="import-data" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+            </label>
+          </div>
+        </label>
+
+        <button class="btn btn--ghost btn--block btn--danger" type="button" data-action="logout">Profil zurücksetzen</button>
+      </div>
+
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Speichern</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── CREATE CHALLENGE MODAL -->
+  <dialog class="modal" id="create-challenge-modal" aria-labelledby="create-ch-title">
+    <form class="modal__inner" id="create-challenge-form" method="dialog">
+      <header class="modal__head">
+        <h2 class="modal__title" id="create-ch-title">Neue Challenge</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Wen forderst du heraus?</span>
+          <select class="input" name="chFriend" required data-bind-id="ch-friend-select"></select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Welches Achievement?</span>
+          <select class="input" name="chAchievement" required data-bind-id="ch-ach-select"></select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Frist (bis wann?)</span>
+          <input class="input" name="chDeadline" type="date" required>
+        </label>
+
+        <div class="stake-card">
+          <span class="stake-card__label">Einsatz</span>
+          <span class="stake-card__amount">1.000 Punkte</span>
+          <span class="stake-card__hint">Sieger bekommt 1.000 Bonus-Punkte vom Verlierer.</span>
+        </div>
+
+        <p class="muted">Sieger ist wer's zuerst freischaltet. Frist abgelaufen ohne Win = automatisch verloren.</p>
+      </div>
+
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Abbrechen</button>
+        <button class="btn btn--primary btn--block" type="submit">Absenden</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ─────────────── SHARE CARD MODAL -->
+  <dialog class="modal" id="share-modal" aria-labelledby="share-title">
+    <div class="modal__inner">
+      <header class="modal__head">
+        <h2 class="modal__title" id="share-title">Achievement teilen</h2>
+        <button class="iconbtn" type="button" data-action="close-modal" aria-label="Schließen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+
+      <div class="modal__body">
+        <article class="share-card" data-bind="shareCard">
+          <header class="share-card__head">
+            <span class="share-card__brand">Ranked.</span>
+            <span class="share-card__date" data-bind="share.date">—</span>
+          </header>
+          <div class="share-card__main">
+            <div class="share-card__icon" data-bind="share.icon">·</div>
+            <h2 class="share-card__title" data-bind="share.title">—</h2>
+            <p class="share-card__cat" data-bind="share.cat">—</p>
+            <div class="share-card__points">
+              +<span data-bind="share.points">0</span>
+              <span class="share-card__points-label">Punkte</span>
+            </div>
+          </div>
+          <footer class="share-card__foot">
+            <div class="share-card__user-row">
+              <div class="avatar avatar--sm" data-bind="share.avatar"></div>
+              <div class="share-card__user-meta">
+                <div class="share-card__name" data-bind="share.name">—</div>
+                <div class="share-card__city" data-bind="share.city">—</div>
+              </div>
+            </div>
+            <div class="share-card__rank">
+              <span class="share-card__rank-label">Stadt</span>
+              <span class="share-card__rank-num">#<span data-bind="share.rank">—</span></span>
+            </div>
+          </footer>
+        </article>
+
+        <p class="muted">Screenshot machen oder direkt teilen — bringt dir mehr Freunde in die App.</p>
+      </div>
+
+      <footer class="modal__foot">
+        <button class="btn btn--ghost btn--block" type="button" data-action="close-modal">Schließen</button>
+        <button class="btn btn--primary btn--block" type="button" data-action="share-achievement">Teilen</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ─────────────── BOTTOM TAB BAR -->
+  <nav class="tabbar" data-tabbar hidden>
+    <a class="tabbar__link tabbar__link--active" data-route="home" href="#home">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="tabbar__label">Profil</span>
+    </a>
+    <a class="tabbar__link" data-route="feed" href="#feed">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span class="tabbar__label">Feed</span>
+    </a>
+    <a class="tabbar__link" data-route="stats" href="#stats">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21H4.6c-.6 0-1-.4-1-1V3"/><polyline points="7 14 11 10 15 14 20 9"/></svg>
+      <span class="tabbar__label">Stats</span>
+    </a>
+    <a class="tabbar__link" data-route="leaderboard" href="#leaderboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" x2="6" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="18" x2="18" y1="20" y2="14"/></svg>
+      <span class="tabbar__label">Ranking</span>
+    </a>
+  </nav>
+
+  <!-- ─────────────── TUTORIAL OVERLAY -->
+  <div class="tutorial" data-tutorial hidden>
+    <div class="tutorial__backdrop"></div>
+    <div class="tutorial__spotlight" data-tutorial-spotlight></div>
+    <div class="tutorial__bubble" data-tutorial-bubble>
+      <div class="tutorial__step">
+        <span class="tutorial__step-num"><span data-tutorial-step>1</span> / <span data-tutorial-total>5</span></span>
+      </div>
+      <h3 class="tutorial__title" data-tutorial-title>—</h3>
+      <p class="tutorial__text" data-tutorial-text>—</p>
+      <div class="tutorial__actions">
+        <button class="btn btn--ghost btn--sm" type="button" data-tutorial-action="skip">Überspringen</button>
+        <button class="btn btn--primary btn--sm" type="button" data-tutorial-action="next">Weiter →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────── CONFETTI CANVAS -->
+  <canvas class="confetti" data-confetti aria-hidden="true"></canvas>
+
+  <!-- ─────────────── TOAST -->
+  <div class="toast" data-toast hidden></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
