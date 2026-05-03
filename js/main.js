@@ -800,7 +800,22 @@
 
   function renderFeed() {
     if (!state.activityStream) state.activityStream = D.buildActivityStream();
-    const stream = state.activityStream;
+    let stream = state.activityStream;
+
+    // Render category filter
+    const filtersEl = $('[data-bind="feedFilters"]');
+    if (filtersEl) {
+      const filters = [{ id: 'all', label: 'Alle' }, ...D.CATEGORIES];
+      filtersEl.innerHTML = filters.map(f => `
+        <button class="chip ${(state.feedFilter || 'all') === f.id ? 'chip--active' : ''}" data-feed-filter="${f.id}" type="button">
+          ${escapeHtml(f.label)}
+        </button>
+      `).join('');
+    }
+
+    if (state.feedFilter && state.feedFilter !== 'all') {
+      stream = stream.filter(item => item.achievement.cat === state.feedFilter);
+    }
 
     // Stories bar (latest activity per friend within last 14 days)
     const cutoff = new Date();
@@ -882,45 +897,36 @@
       const fireCount = item.reactions.fire + (myReact.fire ? 1 : 0);
       const heartCount = item.reactions.heart + (myReact.heart ? 1 : 0);
       const clapCount = item.reactions.clap + (myReact.clap ? 1 : 0);
-      // photo: real for own items with photoId, mock for friends' verified items
+      // BeReal-style: every post has a photo
       const hasRealPhoto = item.isOwn && item.photoId;
-      const showPhoto = hasRealPhoto || (item.cityVerified && (idx % 2 === 0));
       const gradientNum = ((item.id.charCodeAt(0) || 0) % 5) + 1;
-      const photoTag = ({
-        finanzen: '€ Stadt-verifiziert',
-        fitness:  '⊹ Stadt-verifiziert',
-        skills:   '◇ Stadt-verifiziert',
-        streaks:  '↻ Stadt-verifiziert',
-      })[def.cat] || '✓ Stadt-verifiziert';
+      const catLabel = (D.CATEGORIES.find(c => c.id === def.cat) || {}).label || def.cat;
+      const commentsCount = (state.comments && state.comments[item.id] && state.comments[item.id].length) || item.comments || 0;
 
       return `
         <li class="activity-card" data-profile-id="${f.id}">
-          <div class="activity-card__head">
+          <header class="activity-card__head">
             ${avatarHtml(f.name)}
             <div class="activity-card__user">
               <div class="activity-card__name">${escapeHtml(f.name)}</div>
-              <div class="activity-card__when">${fmtAgo(item.date)} · ${escapeHtml(f.city)}</div>
+              <div class="activity-card__when">${fmtAgo(item.date)} · ${escapeHtml(catLabel)}</div>
             </div>
-            ${item.cityVerified ? '<span class="activity-card__verified">✓ verifiziert</span>' : ''}
+          </header>
+
+          <div class="activity-card__photo activity-card__photo--gradient-${gradientNum}" ${hasRealPhoto ? `data-photo-id="${item.photoId}"` : ''}>
+            <span class="activity-card__photo-tag">${item.cityVerified ? '✓ Verifiziert' : escapeHtml(catLabel)}</span>
           </div>
 
-          ${showPhoto ? `
-            <div class="activity-card__photo activity-card__photo--gradient-${gradientNum}" ${hasRealPhoto ? `data-photo-id="${item.photoId}"` : ''}>
-              <span class="activity-card__photo-tag">${photoTag}</span>
-            </div>
-          ` : ''}
-
-          <div class="activity-card__body" data-cat="${def.cat}">
-            <span class="activity-card__icon">${categoryIcon(def.cat)}</span>
-            <span class="activity-card__title">${escapeHtml(def.title)}</span>
-            <span class="activity-card__points">+${fmtNum(def.points)}</span>
+          <div class="activity-card__caption">
+            <span class="activity-card__caption-text">${escapeHtml(def.title)}</span>
+            <span class="activity-card__caption-points">+${fmtNum(def.points)}</span>
           </div>
 
           <div class="activity-card__foot" data-activity-id="${item.id}">
             <button class="reaction ${myReact.fire ? 'reaction--active' : ''}" data-react="fire" type="button">🔥 <span class="reaction__count">${fireCount}</span></button>
             <button class="reaction ${myReact.heart ? 'reaction--active' : ''}" data-react="heart" type="button">❤️ <span class="reaction__count">${heartCount}</span></button>
             <button class="reaction ${myReact.clap ? 'reaction--active' : ''}" data-react="clap" type="button">👏 <span class="reaction__count">${clapCount}</span></button>
-            <span class="activity-card__comment" style="cursor: pointer;">💬 ${item.comments || (state.comments && state.comments[item.id] && state.comments[item.id].length) || 0}</span>
+            <span class="activity-card__comment" style="cursor: pointer;">💬 ${commentsCount}</span>
           </div>
         </li>
       `;
@@ -3031,6 +3037,14 @@
       const a = tutBtn.dataset.tutorialAction;
       if (a === 'next') nextTutorial();
       else if (a === 'skip') finishTutorial();
+      return;
+    }
+
+    // feed filter chip
+    const feedFilter = t.closest('[data-feed-filter]');
+    if (feedFilter) {
+      state.feedFilter = feedFilter.dataset.feedFilter;
+      renderFeed();
       return;
     }
 

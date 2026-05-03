@@ -25,15 +25,8 @@
   <!-- ─────────────── APP LOADING SCREEN -->
   <section class="view view--loading" data-view="loading">
     <div class="loading">
-      <div class="loading__logo logo-mark">
-        <svg class="logo-mark__svg" viewBox="0 0 144 144" aria-hidden="true">
-          <g transform="translate(72 72) rotate(-8) translate(-60 -60)">
-            <path d="M 60 5 C 65 20, 80 15, 92 7 C 100 20, 115 23, 120 35 C 115 47, 130 58, 120 70 C 130 82, 112 92, 115 107 C 100 110, 90 127, 77 120 C 67 130, 50 128, 42 118 C 27 120, 19 108, 19 95 C 2 92, 4 77, 10 67 C -3 58, 4 41, 15 36 C 12 20, 27 12, 40 13 C 48 3, 53 0, 60 5 Z" fill="#C5F12B" stroke="#0E0D0A" stroke-width="4" stroke-linejoin="round"/>
-          </g>
-          <text x="72" y="86" text-anchor="middle" class="logo-mark__rkd">RKD</text>
-        </svg>
-      </div>
-      <div class="loading__brand">Ranked</div>
+      <div class="loading__logo"></div>
+      <div class="loading__brand">Ranked.</div>
       <div class="loading__bar"><span></span></div>
     </div>
   </section>
@@ -41,18 +34,7 @@
   <!-- ─────────────── SPLASH -->
   <section class="view view--splash" data-view="splash">
     <div class="splash">
-      <span class="sticker sticker-bolt sticker--rotate-1" style="top: 60px; right: 8px;"></span>
-      <span class="sticker sticker-flame sticker--rotate-3" style="top: 220px; right: 18px;"></span>
-      <span class="sticker-bubble" style="top: 360px; left: 8px; transform: rotate(-3deg); z-index: 2;">+1.000</span>
-
-      <div class="splash__logo logo-mark">
-        <svg class="logo-mark__svg" viewBox="0 0 144 144" aria-hidden="true">
-          <g transform="translate(72 72) rotate(-8) translate(-60 -60)">
-            <path d="M 60 5 C 65 20, 80 15, 92 7 C 100 20, 115 23, 120 35 C 115 47, 130 58, 120 70 C 130 82, 112 92, 115 107 C 100 110, 90 127, 77 120 C 67 130, 50 128, 42 118 C 27 120, 19 108, 19 95 C 2 92, 4 77, 10 67 C -3 58, 4 41, 15 36 C 12 20, 27 12, 40 13 C 48 3, 53 0, 60 5 Z" fill="#C5F12B" stroke="#0E0D0A" stroke-width="4" stroke-linejoin="round"/>
-          </g>
-          <text x="72" y="86" text-anchor="middle" class="logo-mark__rkd">RKD</text>
-        </svg>
-      </div>
+      <div class="splash__logo"></div>
       <h1 class="splash__title">Ranked</h1>
       <p class="splash__lede">Battle dich mit Freunden in dem was zählt.<br>Achievements. Punkte. Stadt-Ranking.</p>
 
@@ -132,14 +114,7 @@
   <section class="view view--home" data-view="home" hidden>
     <header class="topbar">
       <h1 class="topbar__brand">
-        <span class="topbar__brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22">
-            <g transform="translate(12 12) rotate(-8) translate(-10 -10)">
-              <path d="M 10 1 C 11 4, 13 3, 15 1 C 17 4, 19 4, 20 6 C 19 9, 22 10, 20 12 C 22 14, 19 15, 19 18 C 17 18, 15 21, 13 20 C 11 22, 8 22, 7 20 C 4 20, 3 18, 3 16 C 0 15, 1 12, 2 11 C 0 9, 1 6, 3 6 C 2 3, 4 2, 7 2 C 8 0, 9 0, 10 1 Z" fill="#C5F12B" stroke="#0E0D0A" stroke-width="1.5" stroke-linejoin="round"/>
-            </g>
-          </svg>
-        </span>
-        <span class="topbar__brand-text">Ranked</span>
+        <span class="topbar__brand-text">Ranked.</span>
       </h1>
       <div class="topbar__actions">
         <button class="iconbtn iconbtn--bell" data-action="open-notifications" aria-label="Benachrichtigungen">
@@ -156,8 +131,6 @@
     </header>
 
     <div class="profile-card">
-      <span class="sticker sticker-star sticker--rotate-1" style="top: -22px; left: -16px; z-index: 3;"></span>
-
       <div class="profile-card__row">
         <div class="avatar avatar--lg" data-bind="user.avatar"></div>
         <div class="profile-card__meta">
@@ -286,7 +259,7 @@
 
     <ol class="stories" data-bind="stories"></ol>
 
-    <p class="section__lede">Was deine Freunde gerade geclaimt haben.</p>
+    <nav class="filter-row" data-bind="feedFilters"></nav>
 
     <ol class="activity" data-bind="activity"></ol>
   </section>
