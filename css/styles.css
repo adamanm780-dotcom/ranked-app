@@ -531,6 +531,169 @@ select.input {
 }
 .avatar--xl { width: 76px; height: 76px; font-size: 26px; }
 
+/* ─── TIER BADGES ─── */
+.tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  white-space: nowrap;
+}
+.tier-pill--bronze { background: #CD7F32; color: #FFF; }
+.tier-pill--silver { background: #C0C0C0; color: var(--ink); }
+.tier-pill--gold   { background: var(--amber); color: var(--ink); }
+.tier-pill--plat   { background: var(--ink); color: var(--accent); }
+.tier-pill--legend { background: var(--magenta); color: #FFF; animation: tierShine 2s linear infinite; }
+@keyframes tierShine {
+  0%, 100% { box-shadow: 0 0 0 var(--magenta); }
+  50% { box-shadow: 0 0 12px var(--magenta-bright); }
+}
+
+/* ─── DECORATIVE STICKERS ─── */
+.sticker {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+.sticker--rotate-1 { transform: rotate(-12deg); }
+.sticker--rotate-2 { transform: rotate(8deg); }
+.sticker--rotate-3 { transform: rotate(-5deg); }
+
+/* Lightning bolt sticker */
+.sticker-bolt {
+  width: 56px; height: 56px;
+  background: var(--magenta);
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: #FFF;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  animation: stickerWobble 5s ease-in-out infinite;
+}
+.sticker-bolt::before {
+  content: "⚡";
+  font-size: 26px;
+  line-height: 1;
+}
+
+/* Star sticker */
+.sticker-star {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
+.sticker-star::before { content: "★"; }
+
+/* Flame sticker */
+.sticker-flame {
+  width: 48px; height: 48px;
+  background: var(--amber);
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--ink);
+  font-size: 24px;
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
+.sticker-flame::before { content: "🔥"; }
+
+/* "NEW" sticker tag */
+.sticker-tag {
+  display: inline-block;
+  background: var(--magenta);
+  color: #FFF;
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  border: 2px solid var(--ink);
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+
+/* Speech bubble */
+.sticker-bubble {
+  background: var(--accent);
+  border: 2px solid var(--ink);
+  padding: 8px 12px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variation-settings: "wdth" 90;
+  position: absolute;
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
+.sticker-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -8px; left: 16px;
+  width: 0; height: 0;
+  border: 6px solid transparent;
+  border-top-color: var(--ink);
+}
+.sticker-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -5px; left: 18px;
+  width: 0; height: 0;
+  border: 4px solid transparent;
+  border-top-color: var(--accent);
+  z-index: 1;
+}
+
+/* ─── LOGO MARK (sticker-star) ─── */
+.logo-mark {
+  display: inline-block;
+  position: relative;
+}
+.logo-mark__svg {
+  width: 96px; height: 96px;
+  display: block;
+}
+.logo-mark__rkd {
+  font-family: var(--display);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.07em;
+  fill: #0E0D0A;
+  font-variation-settings: "wdth" 75;
+}
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar__brand-mark {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+}
+.topbar__brand-text {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variation-settings: "wdth" 88;
+  text-transform: uppercase;
+}
+
 /* ─── APP LOADING ─── */
 .view--loading {
   display: flex;
@@ -548,22 +711,13 @@ select.input {
   animation: loadingFade 1400ms var(--ease) forwards;
 }
 .loading__logo {
-  width: 88px; height: 88px;
-  background: var(--ink);
-  color: var(--accent);
-  border-radius: var(--r-sm);
+  width: 120px; height: 120px;
+  background: transparent;
   display: grid; place-items: center;
-  box-shadow: 6px 6px 0 0 var(--accent);
   animation: loadingPulse 1.4s ease-in-out infinite;
 }
-.loading__mark {
-  font-family: var(--display);
-  color: var(--accent);
-  font-size: 48px;
-  font-weight: 800;
-  letter-spacing: -0.08em;
-  font-variation-settings: "wdth" 75;
-}
+.loading__logo .logo-mark__svg { width: 120px; height: 120px; }
+.loading__logo .logo-mark__rkd { font-size: 42px; }
 .loading__brand {
   font-family: var(--display);
   font-size: 22px;
@@ -623,21 +777,18 @@ select.input {
   color: var(--ink);
 }
 .splash__logo {
-  width: 64px; height: 64px;
-  background: var(--ink);
-  color: var(--accent);
-  border-radius: var(--r-sm);
+  width: 110px; height: 110px;
+  background: transparent;
   display: grid; place-items: center;
   margin-bottom: var(--s-2);
-  box-shadow: 4px 4px 0 0 var(--accent);
+  animation: stickerWobble 4s ease-in-out infinite;
 }
-.splash__mark {
-  font-family: var(--display);
-  color: var(--accent);
-  font-size: 36px;
-  font-weight: 800;
-  letter-spacing: -0.06em;
-  font-variation-settings: "wdth" 75;
+.splash__logo .logo-mark__svg { width: 110px; height: 110px; }
+.splash__logo .logo-mark__rkd { font-size: 38px; }
+
+@keyframes stickerWobble {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(3deg); }
 }
 .splash__title {
   font-family: var(--display);
@@ -3798,6 +3949,45 @@ select.input {
   0% { opacity: 0; transform: scale(0.85) translateY(8px); }
   60% { transform: scale(1.04) translateY(0); }
   100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* number ticker pop */
+@keyframes tickerPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); color: var(--magenta); }
+  100% { transform: scale(1); }
+}
+.tickerPop { animation: tickerPop 600ms var(--ease-snap); }
+
+/* card hover bounce — for everything tappable */
+.cat:active,
+.activity-card:active,
+.suggestion:active,
+.squad-card:active,
+.challenge:active,
+.notif-row:active,
+.country-pill:active,
+.ach-item:active {
+  transform: translate(0, 0) scale(0.97) !important;
+  box-shadow: 1px 1px 0 0 var(--ink) !important;
+  transition: transform 80ms var(--ease) !important;
+}
+
+/* Sticker bobbing for decorative elements */
+.sticker-bolt, .sticker-flame {
+  animation: stickerBob 3.5s ease-in-out infinite;
+}
+.sticker-star {
+  animation: stickerSpin 8s ease-in-out infinite;
+}
+@keyframes stickerBob {
+  0%, 100% { transform: translateY(0) rotate(-12deg); }
+  50% { transform: translateY(-6px) rotate(-8deg); }
+}
+@keyframes stickerSpin {
+  0% { transform: rotate(-12deg); }
+  50% { transform: rotate(-15deg); }
+  100% { transform: rotate(-12deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

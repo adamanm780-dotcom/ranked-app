@@ -1,15 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E40FF"/>
-      <stop offset="100%" stop-color="#4F30FF"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="80%" cy="20%" r="50%">
-      <stop offset="0%" stop-color="#EC4899" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#EC4899" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#g)"/>
-  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
-  <text x="50%" y="58%" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="332" font-weight="700" fill="#FFFFFF" letter-spacing="-16">R</text>
+  <rect width="512" height="512" fill="#0E0D0A"/>
+
+  <g transform="translate(256 256) rotate(-8) translate(-192 -192)">
+    <path d="
+      M 192 16
+      C 208 64, 256 48, 294 21
+      C 320 64, 368 75, 384 112
+      C 368 149, 416 187, 384 224
+      C 416 261, 357 293, 368 341
+      C 320 352, 288 405, 245 384
+      C 213 416, 160 411, 133 379
+      C 85 384, 59 341, 59 304
+      C 5 293, 11 245, 32 213
+      C -11 187, 11 133, 48 117
+      C 37 64, 85 37, 128 43
+      C 155 11, 171 0, 192 16 Z
+    " fill="#C5F12B" stroke="#0E0D0A" stroke-width="14" stroke-linejoin="round"/>
+
+    <g opacity="0.16" stroke="#0E0D0A" stroke-width="4" fill="none">
+      <line x1="50" y1="320" x2="370" y2="50"/>
+      <line x1="80" y1="360" x2="360" y2="80"/>
+      <line x1="120" y1="370" x2="360" y2="130"/>
+      <line x1="160" y1="380" x2="370" y2="170"/>
+    </g>
+  </g>
+
+  <text x="256" y="305" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+        font-size="156"
+        font-weight="900"
+        font-stretch="condensed"
+        fill="#0E0D0A"
+        letter-spacing="-8">RKD</text>
+
+  <g transform="translate(372 96)">
+    <rect x="-58" y="-22" width="116" height="44" fill="#0E0D0A"/>
+    <text x="0" y="7" text-anchor="middle"
+          font-family="ui-monospace, 'SF Mono', monospace"
+          font-size="22"
+          font-weight="700"
+          fill="#C5F12B"
+          letter-spacing="3">№01</text>
+  </g>
+
+  <g transform="translate(110 426)">
+    <text x="0" y="0" font-family="ui-monospace, 'SF Mono', monospace"
+          font-size="14" font-weight="700" fill="#C5F12B" letter-spacing="3">VOL.01 / EST.2026</text>
+  </g>
 </svg>

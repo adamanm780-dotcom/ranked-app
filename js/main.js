@@ -227,6 +227,41 @@
   }
 
   function fmtNum(n) { return Number(n).toLocaleString('de-DE'); }
+
+  // Tier badge based on points
+  function tierFor(points) {
+    if (points >= 5000) return { id: 'legend', label: 'Legend' };
+    if (points >= 2000) return { id: 'plat',   label: 'Platin' };
+    if (points >= 1000) return { id: 'gold',   label: 'Gold' };
+    if (points >= 500)  return { id: 'silver', label: 'Silber' };
+    return { id: 'bronze', label: 'Bronze' };
+  }
+  function tierBadgeHtml(points) {
+    const t = tierFor(points);
+    return `<span class="tier-pill tier-pill--${t.id}">${t.label}</span>`;
+  }
+
+  // Animate a number ticker — count from current to target value
+  function tickNumber(el, fromVal, toVal, duration = 1000) {
+    if (!el) return;
+    const start = performance.now();
+    const diff = toVal - fromVal;
+    function step(now) {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      // ease-out-cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      const v = Math.round(fromVal + diff * eased);
+      el.textContent = fmtNum(v);
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        el.textContent = fmtNum(toVal);
+        el.classList.add('tickerPop');
+        setTimeout(() => el.classList.remove('tickerPop'), 700);
+      }
+    }
+    requestAnimationFrame(step);
+  }
   function fmtDate(iso) {
     if (!iso) return '';
     const d = new Date(iso);
@@ -460,11 +495,17 @@
       osc.stop(ctx.currentTime + dur);
     } catch (e) {}
   }
-  function soundAchievement() {
-    // ascending chord — C5, E5, G5
-    playTone(523.25, 0.15);
-    setTimeout(() => playTone(659.25, 0.15), 70);
-    setTimeout(() => playTone(783.99, 0.22), 140);
+  function soundAchievement(points = 0) {
+    // tier-based chords for max wow
+    const tier = tierFor(points).id;
+    const chord = ({
+      bronze: [392.00, 493.88, 587.33],         // G4, B4, D5
+      silver: [523.25, 659.25, 783.99],         // C5, E5, G5
+      gold:   [523.25, 659.25, 783.99, 1046.5], // + C6
+      plat:   [523.25, 659.25, 783.99, 1046.5, 1318.5],
+      legend: [659.25, 783.99, 987.77, 1318.5, 1568, 1976], // big arpeggio
+    })[tier] || [523.25, 659.25, 783.99];
+    chord.forEach((f, i) => setTimeout(() => playTone(f, 0.18, 'triangle', 0.18), i * 70));
   }
   function soundTap()      { playTone(880, 0.06, 'sine', 0.12); }
   function soundReaction() { playTone(1318.5, 0.1, 'triangle', 0.15); }
@@ -490,27 +531,46 @@
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     ctx.scale(dpr, dpr);
 
-    const colors = ['#1E40FF', '#3556FF', '#7C3AED', '#10B981', '#F59E0B', '#E11D48'];
-    const N = 90;
+    const colors = ['#C5F12B', '#FF3B30', '#F2A900', '#0E0D0A', '#DBFF60', '#FF5C52'];
+    const shapes = ['rect', 'circle', 'streamer', 'star'];
+    const N = 130;
     const parts = [];
     for (let i = 0; i < N; i++) {
+      const shape = shapes[Math.floor(Math.random() * shapes.length)];
       parts.push({
-        x: w / 2 + (Math.random() - 0.5) * 60,
+        x: w / 2 + (Math.random() - 0.5) * 80,
         y: h * 0.45,
-        vx: (Math.random() - 0.5) * 9,
-        vy: -10 - Math.random() * 8,
-        g: 0.32 + Math.random() * 0.18,
-        size: 4 + Math.random() * 6,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -12 - Math.random() * 10,
+        g: 0.28 + Math.random() * 0.18,
+        size: shape === 'streamer' ? 18 + Math.random() * 12 : 5 + Math.random() * 7,
         color: colors[Math.floor(Math.random() * colors.length)],
         rot: Math.random() * Math.PI * 2,
-        vRot: (Math.random() - 0.5) * 0.4,
-        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        vRot: (Math.random() - 0.5) * 0.5,
+        shape,
         life: 1,
       });
     }
     let raf;
     const start = performance.now();
-    const dur = 1800;
+    const dur = 2200;
+
+    function drawStar(ctx, size) {
+      ctx.beginPath();
+      const spikes = 5;
+      const outer = size / 2;
+      const inner = outer / 2.4;
+      for (let i = 0; i < spikes * 2; i++) {
+        const r = i % 2 === 0 ? outer : inner;
+        const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+        ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = '#0E0D0A';
+      ctx.stroke();
+    }
 
     function frame(now) {
       const elapsed = now - start;
@@ -521,7 +581,7 @@
         p.y += p.vy;
         p.vy += p.g;
         p.rot += p.vRot;
-        p.vx *= 0.992;
+        p.vx *= 0.99;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.rot);
@@ -529,6 +589,11 @@
         ctx.globalAlpha = remaining;
         if (p.shape === 'rect') {
           ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+        } else if (p.shape === 'streamer') {
+          // long thin ribbon
+          ctx.fillRect(-p.size / 2, -2, p.size, 4);
+        } else if (p.shape === 'star') {
+          drawStar(ctx, p.size * 1.6);
         } else {
           ctx.beginPath();
           ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
@@ -578,7 +643,17 @@
 
     setText('user.name', u.name);
     setText('user.city', u.city);
-    setText('user.score', fmtNum(userScore(u)));
+    const newScore = userScore(u);
+    const scoreEl = $('[data-bind="user.score"]');
+    if (scoreEl) {
+      const oldScore = state.lastScore;
+      if (oldScore != null && oldScore !== newScore) {
+        tickNumber(scoreEl, oldScore, newScore, 1100);
+      } else {
+        scoreEl.textContent = fmtNum(newScore);
+      }
+      state.lastScore = newScore;
+    }
     setText('user.achCount', `${(u.achievements || []).length} insgesamt`);
 
     // bio + goal
@@ -706,14 +781,14 @@
           <li class="ach-item" data-ach-id="${ach.id}">
             <span class="ach-item__icon">${categoryIcon(def.cat)}</span>
             <div class="ach-item__main">
-              <div class="ach-item__title">${escapeHtml(def.title)}</div>
+              <div class="ach-item__title">${escapeHtml(def.title)} ${tierBadgeHtml(def.points)}</div>
               <div class="ach-item__meta">
                 <span>${fmtAgo(ach.date)}</span>
                 <span>·</span>
                 <span class="ach-item__verified ${ach.cityVerified ? '' : 'ach-item__verified--friend'}">
-                  ${ach.cityVerified ? '✓ Stadt-verifiziert' : '✓ Friend-verifiziert'}
+                  ${ach.cityVerified ? '✓ Stadt' : '✓ Friend'}
                 </span>
-                ${(ach.friendReactions && ach.friendReactions.length > 0) ? `<span>· ${ach.friendReactions.length} Reactions</span>` : ''}
+                ${(ach.friendReactions && ach.friendReactions.length > 0) ? `<span>· ${ach.friendReactions.length} ❤</span>` : ''}
               </div>
             </div>
             <span class="ach-item__points">+${fmtNum(def.points)}</span>
@@ -2315,7 +2390,7 @@
     closeAllModals();
     confetti();
     vibrate([20, 40, 30]);
-    soundAchievement();
+    soundAchievement(def.points);
     toast(`+${fmtNum(def.points)} — ${def.title}`);
     render();
     // open share-card after a short delay so confetti registers first

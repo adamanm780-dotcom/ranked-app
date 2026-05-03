@@ -1,10 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1E40FF"/>
-      <stop offset="100%" stop-color="#4F30FF"/>
-    </linearGradient>
-  </defs>
-  <rect width="192" height="192" rx="42" fill="url(#g)"/>
-  <text x="50%" y="56%" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="124" font-weight="700" fill="#FFFFFF" letter-spacing="-6">R</text>
+  <!-- Background plate (mask-safe) -->
+  <rect width="192" height="192" fill="#0E0D0A"/>
+
+  <!-- Asymmetric sticker-star sitting at slight angle -->
+  <g transform="translate(96 96) rotate(-8) translate(-72 -72)">
+    <!-- groovy 9-pointed irregular star (sticker shape) -->
+    <path d="
+      M 72 6
+      C 78 24, 96 18, 110 8
+      C 120 24, 138 28, 144 42
+      C 138 56, 156 70, 144 84
+      C 156 98, 134 110, 138 128
+      C 120 132, 108 152, 92 144
+      C 80 156, 60 154, 50 142
+      C 32 144, 22 130, 22 114
+      C 2 110, 4 92, 12 80
+      C -4 70, 4 50, 18 44
+      C 14 24, 32 14, 48 16
+      C 58 4, 64 0, 72 6 Z
+    " fill="#C5F12B" stroke="#0E0D0A" stroke-width="6" stroke-linejoin="round"/>
+
+    <!-- inner texture: hatching lines for sticker-paper feel -->
+    <g opacity="0.18" stroke="#0E0D0A" stroke-width="2" fill="none">
+      <line x1="20" y1="120" x2="140" y2="20"/>
+      <line x1="30" y1="135" x2="135" y2="30"/>
+      <line x1="45" y1="140" x2="135" y2="50"/>
+    </g>
+  </g>
+
+  <!-- Wordmark "RKD" centered, Display-Heavy -->
+  <text x="96" y="115" text-anchor="middle"
+        font-family="system-ui, -apple-system, 'Helvetica Neue', sans-serif"
+        font-size="58"
+        font-weight="900"
+        font-stretch="condensed"
+        fill="#0E0D0A"
+        letter-spacing="-3">RKD</text>
+
+  <!-- tiny corner stamp -->
+  <g transform="translate(140 36)">
+    <rect x="-22" y="-9" width="44" height="18" fill="#0E0D0A"/>
+    <text x="0" y="3" text-anchor="middle"
+          font-family="ui-monospace, 'SF Mono', monospace"
+          font-size="9"
+          font-weight="700"
+          fill="#C5F12B"
+          letter-spacing="1">№01</text>
+  </g>
 </svg>
