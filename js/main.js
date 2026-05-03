@@ -679,9 +679,18 @@
     const avatarEl = $('[data-bind="user.avatar"]');
     if (avatarEl) {
       const c = userAvatarColor(u);
+      // For own user: still use initials (no real photo). Friends will use portraits.
       avatarEl.style.background = c.bg;
       avatarEl.style.color = c.fg;
+      avatarEl.style.backgroundImage = '';
       avatarEl.textContent = initials(u.name);
+    }
+    // Cover-photo: dynamic per user (deterministic based on name)
+    const profileCard = $('.view--home .profile-card');
+    if (profileCard && D.PHOTO_LIBRARY) {
+      const coverCat = ['fitness','travel','social'][Math.abs(u.name.charCodeAt(0) || 0) % 3];
+      const coverUrl = D.photoFor(coverCat, u.name);
+      profileCard.style.setProperty('--cover-image', `url('${coverUrl}')`);
     }
 
     setText('rank.friends', myFriendRank() || '—');
@@ -899,27 +908,48 @@
       const clapCount = item.reactions.clap + (myReact.clap ? 1 : 0);
       // BeReal-style: every post has a photo
       const hasRealPhoto = item.isOwn && item.photoId;
-      const gradientNum = ((item.id.charCodeAt(0) || 0) % 5) + 1;
       const catLabel = (D.CATEGORIES.find(c => c.id === def.cat) || {}).label || def.cat;
       const commentsCount = (state.comments && state.comments[item.id] && state.comments[item.id].length) || item.comments || 0;
+      // pull caption from achievement entry if present
+      const friend = D.findFriend(f.id);
+      const friendAch = friend && (friend.achievements || []).find(a => a.id === def.id);
+      const caption = friendAch && friendAch.caption ? friendAch.caption : null;
+      // pick photo from library (deterministic per item.id)
+      const photoUrl = D.photoFor(def.cat, item.id);
+      const watermarkTime = (() => {
+        const d = new Date(item.date);
+        return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' }) + ' · ' + (f.city || '');
+      })();
 
       return `
         <li class="activity-card" data-profile-id="${f.id}">
           <header class="activity-card__head">
-            ${avatarHtml(f.name)}
+            <div class="avatar avatar--photo" style="background-image: url('${D.portraitFor(f.id)}')"></div>
             <div class="activity-card__user">
               <div class="activity-card__name">${escapeHtml(f.name)}</div>
-              <div class="activity-card__when">${fmtAgo(item.date)} · ${escapeHtml(catLabel)}</div>
+              <div class="activity-card__when">${fmtAgo(item.date)} · ${escapeHtml(f.city || catLabel)}</div>
             </div>
+            <span class="activity-card__cat-pill">${(D.CATEGORIES.find(c => c.id === def.cat) || {}).icon || ''} ${escapeHtml(catLabel)}</span>
           </header>
 
-          <div class="activity-card__photo activity-card__photo--gradient-${gradientNum}" ${hasRealPhoto ? `data-photo-id="${item.photoId}"` : ''}>
-            <span class="activity-card__photo-tag">${item.cityVerified ? '✓ Verifiziert' : escapeHtml(catLabel)}</span>
+          <div class="activity-card__photo" ${hasRealPhoto ? `data-photo-id="${item.photoId}"` : ''}
+               style="background-image: url('${photoUrl}'); background-size: cover; background-position: center;">
+            <div class="activity-card__photo-watermark">
+              <span class="watermark__title">${escapeHtml(def.title)}</span>
+              <span class="watermark__meta">${escapeHtml(watermarkTime)}</span>
+            </div>
+            ${item.cityVerified ? '<span class="activity-card__photo-tag">✓ Verifiziert</span>' : ''}
           </div>
 
           <div class="activity-card__caption">
-            <span class="activity-card__caption-text">${escapeHtml(def.title)}</span>
-            <span class="activity-card__caption-points">+${fmtNum(def.points)}</span>
+            <span class="activity-card__caption-text">
+              <strong>${escapeHtml(f.name.split(' ')[0])}</strong>
+              ${caption ? escapeHtml(caption) : escapeHtml(def.title)}
+            </span>
+          </div>
+
+          <div class="activity-card__points-row">
+            <span class="activity-card__points-pill">+${fmtNum(def.points)} Punkte</span>
           </div>
 
           <div class="activity-card__foot" data-activity-id="${item.id}">
@@ -1355,19 +1385,69 @@
     state.comments = state.comments || {};
     if (!state.activityStream) state.activityStream = D.buildActivityStream();
     const stream = state.activityStream;
-    const mockTexts = [
-      ['🔥 Insane!', 'Mach weiter so 💪', 'Wie hast du das geschafft?'],
-      ['Damn, beeindruckend', 'Glückwunsch Bro 🎯'],
-      ['LFG!', 'Aktuell auf nem ähnlichen Weg, Inspiration', 'Welche Tipps?'],
+
+    // Comment-pools: realistic, category-specific, conversational
+    const fitnessComments = [
+      'Plate Bro 🔥 wieviele Reps?',
+      'Form sah aus wie auf dem letzten Mal? Trainingstagebuch?',
+      'Hab letzte Woche das gleiche geknackt — nice einer von uns 😂',
+      'Welches Programm fährst du grad? 5/3/1 oder PHUL?',
+      'Patrick wusste das doch lange — willkommen im Club',
+      'Sah dich heute durchs Studio rennen, gz!',
+      'Lass nachher checken ob deine Form sauber war 👀',
     ];
-    stream.slice(0, 5).forEach((item, idx) => {
-      if (Math.random() < 0.5) {
-        const friend = D.FRIENDS[Math.floor(Math.random() * D.FRIENDS.length)];
-        const texts = mockTexts[idx % mockTexts.length];
-        state.comments[item.id] = texts.slice(0, 1 + Math.floor(Math.random() * texts.length)).map((text, i) => ({
+    const financeComments = [
+      'Welcher Anbieter? Trade Republic oder Scalable?',
+      'MRR holding? Recurring oder Einmalverkauf?',
+      'Compound zieht jetzt — keep it up!',
+      'Saug das wäre auch mein Q3-Ziel',
+      'Wie ist dein DCA-Plan?',
+      'Cap-Table-Setup von dir? Würd ich gern lernen.',
+    ];
+    const skillsComments = [
+      'Drop den Link zum Project!',
+      'Was nutzt du fürs Frontend?',
+      'Wie lange war der Build?',
+      'Saubere Arbeit. Open-Source?',
+    ];
+    const travelComments = [
+      'Wie hast du das Visa für Vietnam gehandhabt?',
+      'Weiß ist immer dorthin? Solo?',
+      'Hyatt oder AirBnB?',
+      'Welcher Monat war es? Wetter okay?',
+    ];
+    const generalComments = [
+      'Inspiration pur 💯',
+      'Damn das ist ne Ansage',
+      'Glückwunsch — verdient',
+      'LFG!',
+      'Wie hast du das gemacht? Drop tipps',
+    ];
+
+    const poolFor = (cat) => ({
+      finanzen: financeComments,
+      fitness: fitnessComments,
+      skills: skillsComments,
+      streaks: fitnessComments,
+      social: skillsComments,
+      travel: travelComments,
+      mind: generalComments,
+    })[cat] || generalComments;
+
+    stream.slice(0, 12).forEach((item, idx) => {
+      // 70% chance of having comments
+      if (Math.random() > 0.3) {
+        const pool = poolFor(item.achievement.cat);
+        const count = 1 + Math.floor(Math.random() * 3);
+        // pick distinct random commenters (avoid posting friend himself)
+        const candidates = D.FRIENDS.filter(f => f.id !== item.friendId);
+        const commenters = candidates.slice().sort(() => Math.random() - 0.5).slice(0, count);
+        // pick distinct texts
+        const texts = pool.slice().sort(() => Math.random() - 0.5).slice(0, count);
+        state.comments[item.id] = commenters.map((f, i) => ({
           id: `mock.${item.id}.${i}`,
-          authorId: D.FRIENDS[(idx + i) % D.FRIENDS.length].id,
-          text,
+          authorId: f.id,
+          text: texts[i] || pool[i % pool.length],
           when: item.date,
         }));
       }

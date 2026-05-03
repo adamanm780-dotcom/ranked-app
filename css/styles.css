@@ -505,6 +505,12 @@ select.input {
   font-size: 14px;
   letter-spacing: -0.015em;
   flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
+}
+.avatar--photo {
+  background-color: var(--surface-2);
+  text-indent: -9999px;
 }
 .avatar--sm { width: 32px; height: 32px; font-size: 12px; }
 .avatar--lg { width: 64px; height: 64px; font-size: 22px; box-shadow: none; }
@@ -693,21 +699,13 @@ select.input {
   animation: loadingFade 1400ms var(--ease) forwards;
 }
 .loading__logo {
-  width: 76px; height: 76px;
-  background: var(--ink);
+  width: 64px; height: 64px;
+  background: transparent;
+  color: var(--ink);
   display: grid; place-items: center;
-  border-radius: var(--r-md);
   animation: loadingPulse 1.4s ease-in-out infinite;
 }
-.loading__logo::before {
-  content: "R.";
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 38px;
-  color: #FFFFFF;
-  letter-spacing: -0.04em;
-}
-.loading__logo .logo-mark__svg { display: none; }
+.loading__logo svg { display: block; }
 .loading__brand {
   font-family: var(--sans);
   font-size: 18px;
@@ -758,21 +756,13 @@ select.input {
 }
 .splash::before { display: none; }
 .splash__logo {
-  width: 64px; height: 64px;
-  background: var(--ink);
+  width: 56px; height: 56px;
+  background: transparent;
+  color: var(--ink);
   display: grid; place-items: center;
   margin-bottom: var(--s-2);
-  border-radius: var(--r-md);
 }
-.splash__logo .logo-mark__svg { display: none; }
-.splash__logo::before {
-  content: "R.";
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 32px;
-  color: #FFFFFF;
-  letter-spacing: -0.04em;
-}
+.splash__logo svg { display: block; }
 .splash__title {
   font-family: var(--sans);
   font-size: 44px;
@@ -856,23 +846,57 @@ select.input {
 }
 .onb__pane .btn { margin-top: var(--s-3); }
 
-/* ─── PROFILE-CARD — Clean Minimalist ─── */
+/* ─── PROFILE-CARD — Cover-Photo + Avatar overlap ─── */
 .profile-card {
   background: var(--bg);
   color: var(--ink);
   border: none;
-  border-radius: 0;
-  padding: var(--s-4) 0;
+  border-radius: var(--r-lg);
+  padding: 0 0 var(--s-4);
   display: flex; flex-direction: column;
-  gap: var(--s-5);
+  gap: var(--s-3);
   box-shadow: none;
   position: relative;
+  overflow: hidden;
 }
-.profile-card::before { display: none; }
+.profile-card::before {
+  content: "";
+  display: block;
+  height: 110px;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%),
+    var(--cover-image, linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #60A5FA 100%));
+  background-size: cover;
+  background-position: center;
+}
+.profile-card[data-cover] {
+  /* dynamic cover via inline style is set in JS */
+}
 .profile-card__row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--s-3);
+  margin-top: -36px;
+  padding: 0 var(--s-4);
+}
+.profile-card .avatar--lg {
+  width: 84px; height: 84px;
+  border: 4px solid var(--bg);
+  background-color: var(--surface-2);
+  background-size: cover;
+  background-position: center;
+  font-size: 28px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.profile-card__meta {
+  padding-bottom: 4px;
+}
+.profile-card__bio,
+.profile-card__goal,
+.profile-card__score,
+.profile-card__ranks {
+  margin-left: var(--s-4);
+  margin-right: var(--s-4);
 }
 .profile-card__meta { flex: 1; min-width: 0; }
 .profile-card__name {
@@ -1505,29 +1529,84 @@ select.input {
   color: var(--ink);
 }
 
-/* BeReal-style caption under photo */
-.activity-card__caption {
+/* Activity-Card head: cat-pill */
+.activity-card__cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+  letter-spacing: -0.005em;
+}
+
+/* Watermark on photo (Strava-Proof + BeReal time-stamp) */
+.activity-card__photo-watermark {
+  position: absolute;
+  top: var(--s-3);
+  left: var(--s-3);
+  right: var(--s-3);
+  z-index: 1;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s-3);
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-md);
+}
+.watermark__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+.watermark__meta {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: -0.005em;
+}
+
+/* BeReal-style caption (Instagram-Reel-Style) */
+.activity-card__caption {
+  display: block;
   margin-bottom: var(--s-2);
+  padding: 0 2px;
 }
 .activity-card__caption-text {
-  flex: 1;
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.015em;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.011em;
   color: var(--ink);
-  line-height: 1.3;
+  line-height: 1.45;
 }
-.activity-card__caption-points {
-  font-family: var(--sans);
-  font-size: 16px;
+.activity-card__caption-text strong {
   font-weight: 600;
-  letter-spacing: -0.015em;
+  margin-right: 6px;
   color: var(--ink);
-  white-space: nowrap;
+}
+
+.activity-card__points-row {
+  margin-bottom: var(--s-2);
+}
+.activity-card__points-pill {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--accent-deep);
+  background: var(--accent-tint);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
 }
 .activity-card__points {
   font-family: var(--sans);
@@ -1542,46 +1621,38 @@ select.input {
 .activity-card__body[data-cat="skills"]   .activity-card__points { color: var(--magenta-deep); }
 .activity-card__body[data-cat="streaks"]  .activity-card__points { color: var(--amber-deep); }
 
-/* Photo BeReal-style: large, photo-first, dominant */
+/* Photo BeReal-style: large, photo-first */
 .activity-card__photo {
   width: 100%;
-  aspect-ratio: 4 / 5;  /* BeReal-portrait */
+  aspect-ratio: 4 / 5;
   border-radius: var(--r-lg);
   overflow: hidden;
   position: relative;
-  display: grid; place-items: center;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: rgba(255, 255, 255, 0.92);
+  display: block;
+  background-color: var(--surface-2);
   margin-bottom: var(--s-3);
 }
-.activity-card__photo--gradient-1 { background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%); }
-.activity-card__photo--gradient-2 { background: linear-gradient(135deg, #1F2937 0%, #111827 100%); }
-.activity-card__photo--gradient-3 { background: linear-gradient(135deg, #4A5568 0%, #2D3748 100%); }
-.activity-card__photo--gradient-4 { background: linear-gradient(135deg, #374151 0%, #1F2937 100%); }
-.activity-card__photo--gradient-5 { background: linear-gradient(135deg, #525252 0%, #262626 100%); }
 .activity-card__photo::after { display: none; }
 .activity-card__photo-tag {
   position: absolute;
   bottom: var(--s-3);
-  left: var(--s-3);
+  right: var(--s-3);
   z-index: 1;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  background: rgba(34, 197, 94, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: var(--r-pill);
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   letter-spacing: -0.005em;
   text-transform: none;
+  color: #FFFFFF;
 }
 .activity-card__verified {
   font-family: var(--sans);

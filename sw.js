@@ -1,5 +1,5 @@
 /* Ranked — Service Worker */
-const CACHE_VERSION = 'ranked-v4-minimalist';
+const CACHE_VERSION = 'ranked-v5-content';
 const ASSETS = [
   './',
   './index.html',

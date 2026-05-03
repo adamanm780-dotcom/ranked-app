@@ -1,9 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" fill="#0A0A0A"/>
-  <text x="256" y="320" text-anchor="middle"
-        font-family="-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif"
-        font-size="256"
-        font-weight="600"
-        fill="#FFFFFF"
-        letter-spacing="-13">R<tspan fill="#2563EB">.</tspan></text>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0A0A0A"/>
+      <stop offset="100%" stop-color="#1F1F1F"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g transform="translate(256 308)">
+    <rect x="-122" y="-44" width="58" height="118" fill="#FFFFFF" opacity="0.35" rx="8"/>
+    <rect x="-32" y="-86" width="58" height="160" fill="#FFFFFF" opacity="0.6" rx="8"/>
+    <rect x="58" y="-138" width="58" height="212" fill="#3B82F6" rx="8"/>
+    <circle cx="87" cy="-160" r="14" fill="#3B82F6"/>
+  </g>
 </svg>
