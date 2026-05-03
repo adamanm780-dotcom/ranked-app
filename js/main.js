@@ -679,18 +679,33 @@
     const avatarEl = $('[data-bind="user.avatar"]');
     if (avatarEl) {
       const c = userAvatarColor(u);
-      // For own user: still use initials (no real photo). Friends will use portraits.
       avatarEl.style.background = c.bg;
       avatarEl.style.color = c.fg;
       avatarEl.style.backgroundImage = '';
       avatarEl.textContent = initials(u.name);
+      if (u.avatarPhotoId) {
+        getPhotoUrl(u.avatarPhotoId).then(url => {
+          if (url) {
+            avatarEl.style.backgroundImage = `url('${url}')`;
+            avatarEl.style.backgroundSize = 'cover';
+            avatarEl.style.backgroundPosition = 'center';
+            avatarEl.textContent = '';
+          }
+        });
+      }
     }
-    // Cover-photo: dynamic per user (deterministic based on name)
+    // Cover-photo: user upload OR fallback to category-based mock
     const profileCard = $('.view--home .profile-card');
     if (profileCard && D.PHOTO_LIBRARY) {
-      const coverCat = ['fitness','travel','social'][Math.abs(u.name.charCodeAt(0) || 0) % 3];
-      const coverUrl = D.photoFor(coverCat, u.name);
-      profileCard.style.setProperty('--cover-image', `url('${coverUrl}')`);
+      if (u.coverPhotoId) {
+        getPhotoUrl(u.coverPhotoId).then(url => {
+          if (url) profileCard.style.setProperty('--cover-image', `url('${url}')`);
+        });
+      } else {
+        const coverCat = ['fitness','travel','social'][Math.abs(u.name.charCodeAt(0) || 0) % 3];
+        const coverUrl = D.photoFor(coverCat, u.name);
+        profileCard.style.setProperty('--cover-image', `url('${coverUrl}')`);
+      }
     }
 
     setText('rank.friends', myFriendRank() || '—');
@@ -762,6 +777,9 @@
 
     // suggestions
     renderSuggestions();
+
+    // personal records
+    renderPersonalRecords();
 
     // goals
     renderGoalsList();
@@ -843,13 +861,13 @@
       const stories = Object.values(latestPerFriend).sort((a, b) => b.date.localeCompare(a.date));
       const seen = state.reactions || {};
       const cards = stories.map(item => {
-        const c = D.avatarColor(item.friend.name);
+        const portrait = D.portraitFor(item.friendId);
         const wasSeen = !!seen[item.id];
         return `
           <li class="story" data-profile-id="${item.friendId}">
             <div class="story__ring ${wasSeen ? 'story__ring--seen' : ''}">
               <div class="story__inner">
-                <div class="story__avatar" style="background:${c.bg};color:${c.fg}">${initials(item.friend.name)}</div>
+                <div class="story__avatar" style="background-image: url('${portrait}'); background-size: cover; background-position: center; text-indent: -9999px;">${initials(item.friend.name)}</div>
               </div>
             </div>
             <span class="story__name">${escapeHtml(item.friend.name.split(' ')[0])}</span>
@@ -1371,6 +1389,58 @@
       toast('Import fehlgeschlagen — ungültige Datei');
       soundError();
     }
+  }
+
+  /* ─── PERSONAL RECORDS ─── */
+  // Map of PR-tracking achievement-prefixes to label
+  const PR_GROUPS = [
+    { prefix: 'fit.bench.',  label: 'Bench Press', unit: 'kg' },
+    { prefix: 'fit.squat.',  label: 'Squat',       unit: 'kg' },
+    { prefix: 'fit.dead.',   label: 'Deadlift',    unit: 'kg' },
+    { prefix: 'fit.run.5k.', label: '5K Pace',     unit: 'min' },
+    { prefix: 'fin.side.',   label: 'Side-Hustle MRR', unit: '€' },
+    { prefix: 'fin.invest.', label: 'Investment',  unit: '€' },
+    { prefix: 'fin.save.',   label: 'Saved',       unit: '€' },
+  ];
+  function renderPersonalRecords() {
+    const u = state.user;
+    if (!u) return;
+    const myAchs = (u.achievements || [])
+      .map(a => ({ ach: a, def: findAchievementAny(a.id) }))
+      .filter(x => x.def);
+
+    const records = PR_GROUPS.map(group => {
+      const matches = myAchs.filter(x => x.def.id.startsWith(group.prefix));
+      if (matches.length === 0) return null;
+      // best match: highest points
+      matches.sort((a, b) => b.def.points - a.def.points);
+      const top = matches[0];
+      // extract numeric value from title (e.g., "Bench Press 100 kg" → 100)
+      const match = top.def.title.match(/(\d+(?:\.\d+)?)/);
+      const value = match ? match[1] : '';
+      return {
+        label: group.label,
+        value: value + ' ' + (group.unit === '€' ? '€' : group.unit),
+        date: top.ach.date,
+        count: matches.length,
+      };
+    }).filter(Boolean);
+
+    const section = $('[data-bind-section="prs"]');
+    if (!section) return;
+    if (records.length === 0) {
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+    const target = $('[data-bind="prList"]');
+    target.innerHTML = records.map(r => `
+      <li class="pr-card">
+        <span class="pr-card__label">${escapeHtml(r.label)}</span>
+        <span class="pr-card__value">${escapeHtml(r.value.startsWith(' €') ? '€' + r.value.replace(' €', '') : r.value)}</span>
+        <span class="pr-card__sub">${fmtAgo(r.date)} · ${r.count} ${r.count === 1 ? 'Stufe' : 'Stufen'}</span>
+      </li>
+    `).join('');
   }
 
   /* ─── COMMENTS ─── */
@@ -3030,6 +3100,9 @@
           closeAllModals();
           setTimeout(startTutorial, 400);
           return;
+        case 'onb-detect-city':
+          detectCityAuto();
+          return;
         case 'post-comment':
           postComment();
           return;
@@ -3331,33 +3404,96 @@
       panes[visibleIndex + 1].hidden = false;
       const stepEl = $('[data-onb-step]');
       if (stepEl) stepEl.textContent = visibleIndex + 2;
-      if (visibleIndex + 1 === panes.length - 1) {
-        // step 3 — render color picker
+      // Render color picker on Avatar-step (step 3, index 2)
+      const newPane = panes[visibleIndex + 1];
+      if (newPane && newPane.dataset.step === '3') {
         renderColorPicker('onbColors', 'auto');
+        updateOnbAvatarPreview();
       }
     }
   }
+  function updateOnbAvatarPreview() {
+    const el = $('[data-bind="onb.avatarPreview"]');
+    if (!el) return;
+    const photoUrl = state.onbPhotoUrl;
+    const colorId = $('#onboarding-form input[name="avatarColor"]')?.value || 'auto';
+    const nameInput = $('#onboarding-form input[name="name"]');
+    const name = nameInput && nameInput.value ? nameInput.value : '?';
+    if (photoUrl) {
+      el.style.backgroundImage = `url('${photoUrl}')`;
+      el.textContent = '';
+    } else {
+      const palette = AVATAR_PALETTE.find(p => p.id === colorId);
+      const c = palette || D.avatarColor(name);
+      el.style.backgroundImage = '';
+      el.style.background = c.bg;
+      el.style.color = c.fg;
+      el.textContent = initials(name);
+    }
+  }
+  async function detectCityAuto() {
+    if (!navigator.geolocation) {
+      toast('GeoLocation nicht verfügbar');
+      return;
+    }
+    toast('Standort wird abgefragt…');
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      try {
+        const { latitude, longitude } = pos.coords;
+        // free reverse-geocoding via OpenStreetMap Nominatim (no API key needed)
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=de`;
+        const res = await fetch(url, { headers: { 'User-Agent': 'Ranked-App' } });
+        const data = await res.json();
+        const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || '';
+        if (city) {
+          const cityInput = $('#onboarding-form input[name="city"]');
+          if (cityInput) {
+            cityInput.value = city;
+            toast(`📍 ${city}`);
+          }
+        } else {
+          toast('Stadt nicht erkannt — bitte manuell');
+        }
+      } catch (e) {
+        toast('Stadterkennung fehlgeschlagen');
+      }
+    }, () => {
+      toast('Standort-Zugriff verweigert');
+    });
+  }
 
   /* ─── form submits ─── */
-  document.addEventListener('submit', (e) => {
+  document.addEventListener('submit', async (e) => {
     if (e.target.id === 'onboarding-form') {
       e.preventDefault();
       const fd = new FormData(e.target);
-      state.user = {
+      const newUser = {
         name: (fd.get('name') || '').toString().trim(),
         city: (fd.get('city') || '').toString().trim(),
         height: Number(fd.get('height')) || null,
         weight: Number(fd.get('weight')) || null,
+        bio: (fd.get('bio') || '').toString().trim(),
+        goal: (fd.get('goal') || '').toString().trim(),
         avatarColor: (fd.get('avatarColor') || 'auto').toString(),
         achievements: [], trophies: [],
+        goals: [], visitedCountries: [], customAchievements: [],
         bonusPoints: 0,
         createdAt: new Date().toISOString(),
       };
+      // save avatar photo if uploaded
+      if (state.onbPhotoFile) {
+        const photoId = 'avatar.' + Date.now();
+        await savePhoto(photoId, state.onbPhotoFile);
+        newUser.avatarPhotoId = photoId;
+        if (state.onbPhotoUrl) URL.revokeObjectURL(state.onbPhotoUrl);
+        state.onbPhotoUrl = null;
+        state.onbPhotoFile = null;
+      }
+      state.user = newUser;
       saveUser();
       state.history = ['home'];
       go('home', { skipHistory: true });
       toast('Profil angelegt — leg los!');
-      // start tutorial after a short delay so home renders first
       setTimeout(startTutorial, 800);
     }
 
@@ -3444,6 +3580,42 @@
       e.target.value = '';
       return;
     }
+    if (e.target.matches('[data-bind-id="onb-photo-camera"], [data-bind-id="onb-photo-gallery"]')) {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        if (state.onbPhotoUrl) URL.revokeObjectURL(state.onbPhotoUrl);
+        state.onbPhotoUrl = URL.createObjectURL(file);
+        state.onbPhotoFile = file;
+      }
+      updateOnbAvatarPreview();
+      return;
+    }
+    if (e.target.matches('[data-bind-id="cover-photo-camera"], [data-bind-id="cover-photo-gallery"]')) {
+      const file = e.target.files && e.target.files[0];
+      if (file && state.user) {
+        const photoId = 'cover.' + Date.now();
+        savePhoto(photoId, file).then(() => {
+          state.user.coverPhotoId = photoId;
+          saveUser();
+          toast('Cover-Photo gespeichert');
+          render();
+        });
+      }
+      return;
+    }
+    if (e.target.matches('[data-bind-id="settings-avatar-camera"], [data-bind-id="settings-avatar-gallery"]')) {
+      const file = e.target.files && e.target.files[0];
+      if (file && state.user) {
+        const photoId = 'avatar.' + Date.now();
+        savePhoto(photoId, file).then(() => {
+          state.user.avatarPhotoId = photoId;
+          saveUser();
+          toast('Avatar gespeichert');
+          render();
+        });
+      }
+      return;
+    }
     if (e.target.matches('[data-bind-id="confirm-proof-camera"], [data-bind-id="confirm-proof-gallery"], [data-bind-id="confirm-proof"]')) {
       const file = e.target.files && e.target.files[0];
       if (state.pending) {
@@ -3465,6 +3637,57 @@
     }
   });
 
+  /* ─── pull-to-refresh ─── */
+  function initPullToRefresh() {
+    let startY = 0;
+    let pulling = false;
+    let pullDistance = 0;
+    const THRESHOLD = 70;
+    const indicator = $('[data-bind="ptr"]');
+
+    document.addEventListener('touchstart', (e) => {
+      if (document.body.dataset.view !== 'feed') return;
+      if (window.scrollY > 0) return;
+      startY = e.touches[0].clientY;
+      pulling = true;
+      pullDistance = 0;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!pulling) return;
+      const y = e.touches[0].clientY;
+      pullDistance = y - startY;
+      if (pullDistance > 0 && indicator) {
+        indicator.classList.add('ptr-indicator--active');
+        indicator.style.height = Math.min(pullDistance * 0.6, 56) + 'px';
+        indicator.textContent = pullDistance > THRESHOLD ? '↻ Loslassen zum Aktualisieren' : '↓ Ziehen…';
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      if (!pulling) return;
+      pulling = false;
+      if (pullDistance > THRESHOLD && indicator) {
+        indicator.innerHTML = '<span class="ptr-indicator__spinner"></span> Aktualisiere…';
+        indicator.classList.add('ptr-indicator--refreshing');
+        soundTap();
+        // simulate refresh: rebuild activity stream
+        setTimeout(() => {
+          state.activityStream = D.buildActivityStream();
+          renderFeed();
+          indicator.classList.remove('ptr-indicator--active', 'ptr-indicator--refreshing');
+          indicator.style.height = '';
+          indicator.textContent = '';
+          toast('Feed aktualisiert');
+        }, 800);
+      } else if (indicator) {
+        indicator.classList.remove('ptr-indicator--active');
+        indicator.style.height = '';
+        indicator.textContent = '';
+      }
+    });
+  }
+
   /* ─── init ─── */
   function init() {
     state.user = loadUser();
@@ -3473,6 +3696,7 @@
     state.squads = loadSquads();
     state.comments = loadComments();
     seedMockComments();
+    initPullToRefresh();
 
     // brief loading screen on cold start
     setTimeout(() => {

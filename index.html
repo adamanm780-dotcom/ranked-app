@@ -82,26 +82,82 @@
     </header>
 
     <form class="onb" id="onboarding-form">
+      <!-- Step 1: Welcome -->
       <fieldset class="onb__pane" data-step="1">
-        <p class="eyebrow">Schritt 1 / 3</p>
+        <p class="eyebrow">Willkommen</p>
+        <h2 class="onb__title">Lass uns dein Profil bauen</h2>
+        <p class="onb__hint">6 schnelle Schritte. Du kannst alles später ändern.</p>
+        <ul class="onb-list">
+          <li>① Dein Name</li>
+          <li>② Avatar-Photo</li>
+          <li>③ Stadt</li>
+          <li>④ Baseline (Größe, Gewicht)</li>
+          <li>⑤ Bio</li>
+          <li>⑥ Dein erstes Ziel</li>
+        </ul>
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Los geht's</button>
+      </fieldset>
+
+      <!-- Step 2: Name -->
+      <fieldset class="onb__pane" data-step="2" hidden>
+        <p class="eyebrow">Schritt 1 von 6</p>
         <h2 class="onb__title">Wie heißt du?</h2>
         <p class="onb__hint">Echter Name. Kein Anonym-Game.</p>
         <input class="input" type="text" name="name" placeholder="z. B. Benet Adamanm" autocomplete="given-name" required>
         <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
       </fieldset>
 
-      <fieldset class="onb__pane" data-step="2" hidden>
-        <p class="eyebrow">Schritt 2 / 3</p>
-        <h2 class="onb__title">Deine Stadt?</h2>
-        <p class="onb__hint">Hier siehst du die Top-100 deiner Stadt.</p>
-        <input class="input" type="text" name="city" placeholder="z. B. Wiesbaden" autocomplete="address-level2" required>
+      <!-- Step 3: Avatar-Photo -->
+      <fieldset class="onb__pane" data-step="3" hidden>
+        <p class="eyebrow">Schritt 2 von 6</p>
+        <h2 class="onb__title">Avatar</h2>
+        <p class="onb__hint">Echtes Foto oder eine Farbe. Du kannst es später ändern.</p>
+
+        <div class="onb-avatar-preview">
+          <div class="onb-avatar-preview__circle" data-bind="onb.avatarPreview"></div>
+        </div>
+
+        <div class="upload-row">
+          <label class="upload upload--camera">
+            <input type="file" accept="image/*" capture="user" data-bind-id="onb-photo-camera">
+            <span class="upload__inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Foto machen</span>
+            </span>
+          </label>
+          <label class="upload upload--gallery">
+            <input type="file" accept="image/*" data-bind-id="onb-photo-gallery">
+            <span class="upload__inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Galerie</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Oder Farbe (Initialen)</span>
+          <ul class="color-picker" data-bind="onbColors"></ul>
+          <input type="hidden" name="avatarColor" value="auto">
+        </div>
+
         <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
       </fieldset>
 
-      <fieldset class="onb__pane" data-step="3" hidden>
-        <p class="eyebrow">Schritt 3 / 3</p>
+      <!-- Step 4: City + GeoLocation -->
+      <fieldset class="onb__pane" data-step="4" hidden>
+        <p class="eyebrow">Schritt 3 von 6</p>
+        <h2 class="onb__title">Deine Stadt</h2>
+        <p class="onb__hint">Hier siehst du die Top-100 deiner Stadt.</p>
+        <input class="input" type="text" name="city" placeholder="z. B. Wiesbaden" autocomplete="address-level2" required>
+        <button class="btn btn--ghost btn--block" type="button" data-action="onb-detect-city">📍 Automatisch erkennen</button>
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
+      </fieldset>
+
+      <!-- Step 5: Baseline -->
+      <fieldset class="onb__pane" data-step="5" hidden>
+        <p class="eyebrow">Schritt 4 von 6</p>
         <h2 class="onb__title">Baseline</h2>
-        <p class="onb__hint">Damit dein Wachstum messbar wird. Kannst du jederzeit ändern.</p>
+        <p class="onb__hint">Damit dein Wachstum messbar wird.</p>
         <div class="onb__row">
           <label class="field">
             <span class="field__label">Größe (cm)</span>
@@ -112,13 +168,25 @@
             <input class="input" type="number" name="weight" min="35" max="200" value="78">
           </label>
         </div>
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
+      </fieldset>
 
-        <div class="field">
-          <span class="field__label">Avatar-Farbe</span>
-          <ul class="color-picker" data-bind="onbColors"></ul>
-          <input type="hidden" name="avatarColor" value="auto">
-        </div>
+      <!-- Step 6: Bio -->
+      <fieldset class="onb__pane" data-step="6" hidden>
+        <p class="eyebrow">Schritt 5 von 6</p>
+        <h2 class="onb__title">Bio</h2>
+        <p class="onb__hint">Eine Zeile über dich. Sichtbar für Friends. (Optional)</p>
+        <input class="input" type="text" name="bio" maxlength="100" placeholder="z. B. Hustle hard, train harder.">
+        <button class="btn btn--primary btn--block" type="button" data-action="onb-next">Weiter</button>
+      </fieldset>
 
+      <!-- Step 7: Goal -->
+      <fieldset class="onb__pane" data-step="7" hidden>
+        <p class="eyebrow">Schritt 6 von 6</p>
+        <h2 class="onb__title">Dein erstes Ziel</h2>
+        <p class="onb__hint">Was willst du in den nächsten 3 Monaten erreichen?</p>
+        <input class="input" type="text" name="goal" maxlength="80" placeholder="z. B. Bench 100 kg">
+        <p class="muted" style="font-size: 12px;">Sichtbar auf deinem Profil. Optional.</p>
         <button class="btn btn--primary btn--block" type="submit">Profil erstellen</button>
       </fieldset>
     </form>
@@ -188,6 +256,14 @@
       </div>
       <div class="streak-card__chip" data-bind="streak.chip">—</div>
     </div>
+
+    <section class="section" data-bind-section="prs" hidden>
+      <header class="section__head">
+        <h3 class="section__title">Personal Records</h3>
+        <span class="section__hint">Deine Bestleistungen</span>
+      </header>
+      <ul class="pr-list" data-bind="prList"></ul>
+    </section>
 
     <section class="section" data-bind-section="goals">
       <header class="section__head">
@@ -270,6 +346,8 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
     </header>
+
+    <div class="ptr-indicator" data-bind="ptr"></div>
 
     <ol class="stories" data-bind="stories"></ol>
 
@@ -852,6 +930,34 @@
       </header>
 
       <div class="modal__body">
+        <div class="field">
+          <span class="field__label">Avatar-Foto</span>
+          <div class="upload-row">
+            <label class="upload">
+              <input type="file" accept="image/*" capture="user" data-bind-id="settings-avatar-camera">
+              <span class="upload__inner">📷 Foto machen</span>
+            </label>
+            <label class="upload">
+              <input type="file" accept="image/*" data-bind-id="settings-avatar-gallery">
+              <span class="upload__inner">🖼 Galerie</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field__label">Cover-Foto (Profil-Hintergrund)</span>
+          <div class="upload-row">
+            <label class="upload">
+              <input type="file" accept="image/*" capture="environment" data-bind-id="cover-photo-camera">
+              <span class="upload__inner">📷 Foto machen</span>
+            </label>
+            <label class="upload">
+              <input type="file" accept="image/*" data-bind-id="cover-photo-gallery">
+              <span class="upload__inner">🖼 Galerie</span>
+            </label>
+          </div>
+        </div>
+
         <label class="field">
           <span class="field__label">Name</span>
           <input class="input" name="settingsName" type="text" required>

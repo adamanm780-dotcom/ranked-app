@@ -833,6 +833,37 @@ select.input {
   text-transform: none;
   line-height: 1.15;
 }
+.onb-list {
+  display: flex; flex-direction: column;
+  gap: var(--s-2);
+  background: var(--surface-2);
+  padding: var(--s-4);
+  border-radius: var(--r-md);
+  margin: var(--s-3) 0;
+}
+.onb-list li {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  letter-spacing: -0.005em;
+}
+.onb-avatar-preview {
+  display: flex;
+  justify-content: center;
+  margin: var(--s-3) 0;
+}
+.onb-avatar-preview__circle {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  background-size: cover;
+  background-position: center;
+  display: grid; place-items: center;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 36px;
+  color: var(--ink-3);
+}
 .onb__hint {
   color: var(--ink-3);
   font-size: 13px;
@@ -1384,6 +1415,33 @@ select.input {
   color: var(--ink);
   letter-spacing: 0;
   white-space: nowrap;
+}
+
+/* ─── PULL TO REFRESH ─── */
+.ptr-indicator {
+  height: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-3);
+  font-weight: 500;
+  transition: height 200ms var(--ease);
+}
+.ptr-indicator--active { height: 56px; }
+.ptr-indicator--refreshing { height: 56px; }
+.ptr-indicator__spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--surface-3);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: ptrSpin 0.8s linear infinite;
+  margin-right: 8px;
+}
+@keyframes ptrSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* ─── STORIES BAR ─── */
@@ -2865,6 +2923,38 @@ select.input {
   padding: var(--s-8) var(--s-4);
   color: var(--ink-3);
   font-size: 13px;
+}
+
+/* ─── PERSONAL RECORDS ─── */
+.pr-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-2); }
+.pr-card {
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-md);
+  padding: var(--s-3) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pr-card__label {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-3);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+.pr-card__value {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.pr-card__sub {
+  font-family: var(--sans);
+  font-size: 11px;
+  color: var(--ink-4);
 }
 
 /* ─── GOALS LIST ─── */
