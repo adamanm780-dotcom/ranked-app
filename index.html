@@ -16,7 +16,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -766,14 +766,24 @@
         <p class="field__label">Wer bestätigt's?</p>
         <ul class="confirm-friends" data-bind="confirm.friends"></ul>
 
-        <label class="upload">
-          <input type="file" accept="image/*" name="proof" data-bind-id="confirm-proof">
-          <span class="upload__inner">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-            <span class="upload__label">Foto-Beweis <em>(für Stadt-Leaderboard)</em></span>
-            <span class="upload__filename" data-bind="confirm.proofName"></span>
-          </span>
-        </label>
+        <div class="upload-row">
+          <label class="upload upload--camera">
+            <input type="file" accept="image/*" capture="environment" name="proof" data-bind-id="confirm-proof-camera">
+            <span class="upload__inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              <span>Foto machen</span>
+            </span>
+          </label>
+          <label class="upload upload--gallery">
+            <input type="file" accept="image/*" name="proofGallery" data-bind-id="confirm-proof-gallery">
+            <span class="upload__inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Aus Galerie</span>
+            </span>
+          </label>
+        </div>
+        <div class="upload__filename" data-bind="confirm.proofName"></div>
+        <p class="muted" style="font-size: 11px;">Foto-Beweis ist Pflicht fürs Stadt-Leaderboard.</p>
       </div>
 
       <footer class="modal__foot">

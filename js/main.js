@@ -3275,13 +3275,13 @@
       e.target.value = '';
       return;
     }
-    if (e.target.matches('[data-bind-id="confirm-proof"]')) {
+    if (e.target.matches('[data-bind-id="confirm-proof-camera"], [data-bind-id="confirm-proof-gallery"], [data-bind-id="confirm-proof"]')) {
       const file = e.target.files && e.target.files[0];
       if (state.pending) {
         state.pending.proof = file ? file.name : null;
         state.pending.proofFile = file || null;
       }
-      setText('confirm.proofName', file ? file.name : '');
+      setText('confirm.proofName', file ? '✓ ' + file.name : '');
       // visual preview thumbnail next to upload-label
       const preview = $('[data-bind="confirm.proofPreview"]');
       if (preview) {
